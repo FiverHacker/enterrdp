@@ -1,20 +1,43 @@
 name: Windows - LiteManager
-on: 
+
+on:
   workflow_dispatch:
 
 jobs:
   build:
-    name: Start Building...
+    name: Start LiteManager RDP
     runs-on: windows-latest
 
     steps:
-      - name: Downloading & installing Essentials
+      - name: Download & Install Essentials
+        shell: powershell
         run: |
-          Invoke-WebRequest -Uri "https://gitlab.com/chamod121/m_win_10_github_rdp/-/raw/main/Downloads.bat" -OutFile "Downloads.bat"
-          cmd /c Downloads.bat
+          $url = "https://gitlab.com/chamod121/m_win_10_github_rdp/-/raw/main/Downloads.bat"
+          $output = "Downloads.bat"
+          Invoke-WebRequest -Uri $url -OutFile $output
+          if (Test-Path $output) {
+            Start-Process -FilePath "cmd.exe" -ArgumentList "/c Downloads.bat" -Wait
+          } else {
+            Write-Host "Download failed!"
+            exit 1
+          }
 
       - name: Connect to LiteManager
-        run: cmd /c show.bat
+        shell: cmd
+        run: |
+          if exist show.bat (
+            cmd /c show.bat
+          ) else (
+            echo show.bat not found!
+            exit 1
+          )
 
-      - name: Time Counter
-        run: cmd /c loop.bat
+      - name: Start Time Counter
+        shell: cmd
+        run: |
+          if exist loop.bat (
+            cmd /c loop.bat
+          ) else (
+            echo loop.bat not found!
+            exit 1
+          )
